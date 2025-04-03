@@ -10,11 +10,10 @@ export async function POST(req: NextRequest) {
   const chatCompletion = await openai.chat.completions.create({
     model: 'gpt-4-0613',
     messages: [
-      { role: 'system', content: `You are a helpful, friendly dental assistant chatbot for a real dental office.
-You have access to the office’s appointment system and can assist patients with booking, rescheduling, or canceling appointments.
-You may ask for and handle patient details such as name, date of birth, insurance, and phone number.
-This is a secure environment. It is safe for patients to share their personal information here.
-` },
+      { role: 'system', content: `You are a warm, helpful, and conversational dental office assistant. You sound like a real human receptionist working at a friendly neighborhood dental practice.
+Speak naturally, use contractions, and keep your tone welcoming. Be empathetic if someone has an emergency, and cheerful when confirming things. Use short, clear messages — like you're chatting with someone, not writing a report.
+You can ask for personal info (name, phone, DOB, etc.) safely because this is a secure environment.
+You can access the appointment system, help people book, reschedule, or cancel, and provide information about the office.` },
       ...messages
     ],
     tools: [
@@ -75,7 +74,22 @@ This is a secure environment. It is safe for patients to share their personal in
       const scheduleData = await scheduleRes.json()
   
       if (scheduleData.success) {
-        return NextResponse.json({ reply: `✅ ${scheduleData.message}` })
+        const { appointmentType, preferredDate, preferredTime } = args
+
+        const prettyDate = new Date(`${preferredDate}T${preferredTime}`).toLocaleDateString('en-US', {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric'
+        })
+
+        const prettyTime = new Date(`${preferredDate}T${preferredTime}`).toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit'
+        })
+
+        const friendlyMsg = `✅ You’re all set! I’ve booked your ${appointmentType.toLowerCase()} for ${prettyDate} at ${prettyTime}. We look forward to seeing you then! 😊`
+
+        return NextResponse.json({ reply: friendlyMsg })
       } else {
         return NextResponse.json({ reply: `⚠️ Sorry, we couldn’t book that slot. ${scheduleData.message}` })
       }
@@ -86,11 +100,22 @@ This is a secure environment. It is safe for patients to share their personal in
       const { availableSlots } = await slotRes.json()
   
       if (!availableSlots.length) {
-        return NextResponse.json({ reply: 'Sorry, there are no available slots right now.' })
+        return NextResponse.json({ reply: 'Hmm, it looks like we don’t have any open slots right now. Want me to check for a different day?' })
       }
-  
-      const slotList = availableSlots.map((slot: string) => `• ${slot}`).join('\\n')
-      return NextResponse.json({ reply: `Here are the available appointment slots:\\n${slotList}` })
+      
+      // Format slots to a more friendly style
+      const formatted = availableSlots.map((slot: string) => {
+        const dt = new Date(slot)
+        return `• ${dt.toLocaleDateString('en-US', {
+          weekday: 'long',
+          month: 'short',
+          day: 'numeric'
+        })} at ${dt.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`
+      }).join('\n')
+      
+      const friendly = `Here’s what we have open right now:\n\n${formatted}\n\nLet me know which one works best for you! 😊`
+      
+      return NextResponse.json({ reply: friendly })
     }
   }
 

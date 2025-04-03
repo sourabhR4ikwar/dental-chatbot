@@ -260,7 +260,7 @@ Remember users name dob throughout the flow.
     if (toolCall.function.name === 'verifyPatient') {
       const { name, dob } = args
       const db = await readDB()
-      const patient = db.patients.find(p => p.name === name && p.dob === dob)
+      const patient = db.patients.find((p: any) => p.name === name && p.dob === dob)
       console.log({name, dob})
       console.log(db.patients)
     
@@ -271,8 +271,8 @@ Remember users name dob throughout the flow.
       }
     
       const appointments = db.appointments
-        .filter(a => a.patientId === patient.id)
-        .map(a => {
+        .filter((a: any) => a.patientId === patient.id)
+        .map((a: any) => {
           const time = new Date(a.time).toLocaleString('en-US', {
             weekday: 'long', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'
           })

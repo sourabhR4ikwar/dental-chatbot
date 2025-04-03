@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: false, message: 'Slot not available' }, { status: 400 })
   }
 
-  let patient = db.patients.find(p => p.name === name && p.dob === dob)
+  let patient = db.patients.find((p: any) => p.name === name && p.dob === dob)
   if (!patient) {
     const newId = db.patients.length + 1
     patient = { id: newId, name, dob, phone, insurance }
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
   }
 
   db.appointments.push(appointment)
-  db.availableSlots = db.availableSlots.filter(slot => slot !== requestedSlot)
+  db.availableSlots = db.availableSlots.filter((slot: any) => slot !== requestedSlot)
 
   await writeDB(db)
   return NextResponse.json({ success: true, message: `Appointment booked for ${requestedSlot}` })

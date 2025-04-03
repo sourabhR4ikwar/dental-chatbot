@@ -11,6 +11,7 @@ export default function ChatPage() {
     {
       role: "assistant",
       content: "Hi there! Welcome to Smile Dental Care 🦷 How can I help you today.",
+      isLoading: false
     },
   ])
   const [input, setInput] = useState("")
@@ -30,7 +31,7 @@ export default function ChatPage() {
     if (!input.trim()) return
 
     setIsLoading(true)
-    const newMessages = [...messages, { role: "user", content: input }]
+    const newMessages = [...messages, { role: "user", content: input, isLoading: false }]
     setMessages(newMessages)
     setInput("")
 
@@ -46,11 +47,11 @@ export default function ChatPage() {
       const data = await res.json()
 
       // Replace the loading message with the actual response
-      setMessages([...newMessages, { role: "assistant", content: data.reply }])
+      setMessages([...newMessages, { role: "assistant", content: data.reply, isLoading: false }])
     } catch (error) {
       console.error("Error sending message:", error)
       // Show error message if request fails
-      setMessages([...newMessages, { role: "assistant", content: "Sorry, I encountered an error. Please try again." }])
+      setMessages([...newMessages, { role: "assistant", content: "Sorry, I encountered an error. Please try again.", isLoading: false }])
     } finally {
       setIsLoading(false)
     }

@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
     const member = family[i]
     const time = slotsToBook[i]
 
-    let patient = db.patients.find(p => p.name === member.name && p.dob === member.dob)
+    let patient = db.patients.find((p:any) => p.name === member.name && p.dob === member.dob)
     if (!patient) {
       const newId = db.patients.length + 1
       patient = { id: newId, name: member.name, dob: member.dob, phone: '', insurance: '' }
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
       type: member.appointmentType
     })
 
-    db.availableSlots = db.availableSlots.filter(slot => slot !== time)
+    db.availableSlots = db.availableSlots.filter((slot: any) => slot !== time)
 
     const pretty = new Date(time).toLocaleString('en-US', {
       weekday: 'long', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'

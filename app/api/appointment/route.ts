@@ -7,13 +7,13 @@ export async function PUT(req: NextRequest) {
   const { name, dob, appointmentId, newDate, newTime } = await req.json()
   const db = await readDB()
 
-  const patient = db.patients.find(p => p.name === name && p.dob === dob)
+  const patient = db.patients.find((p: any) => p.name === name && p.dob === dob)
   if (!patient) {
     return NextResponse.json({ success: false, message: 'Patient not found.' }, { status: 404 })
   }
 
   const appointment = db.appointments.find(
-    a => a.id === appointmentId && a.patientId === patient.id
+    (a: any) => a.id === appointmentId && a.patientId === patient.id
   )
   if (!appointment) {
     return NextResponse.json({ success: false, message: 'Appointment not found.' }, { status: 404 })
@@ -27,7 +27,7 @@ export async function PUT(req: NextRequest) {
 
   db.availableSlots.push(appointment.time) // free old
   appointment.time = newSlot
-  db.availableSlots = db.availableSlots.filter(slot => slot !== newSlot)
+  db.availableSlots = db.availableSlots.filter((slot: any) => slot !== newSlot)
 
   await writeDB(db)
 
@@ -42,13 +42,13 @@ export async function POST(req: NextRequest) {
   const { name, dob, appointmentId } = await req.json()
   const db = await readDB()
 
-  const patient = db.patients.find(p => p.name === name && p.dob === dob)
+  const patient = db.patients.find((p: any) => p.name === name && p.dob === dob)
   if (!patient) {
     return NextResponse.json({ success: false, message: 'Patient not found.' }, { status: 404 })
   }
 
   const index = db.appointments.findIndex(
-    a => a.id === appointmentId && a.patientId === patient.id
+    (a: any) => a.id === appointmentId && a.patientId === patient.id
   )
   if (index === -1) {
     return NextResponse.json({ success: false, message: 'Appointment not found.' }, { status: 404 })
@@ -73,12 +73,12 @@ export async function GET(req: NextRequest) {
   }
 
   const db = await readDB()
-  const patient = db.patients.find(p => p.name === name && p.dob === dob)
+  const patient = db.patients.find((p: any) => p.name === name && p.dob === dob)
   if (!patient) {
     return NextResponse.json({ success: false, message: 'Patient not found.' }, { status: 404 })
   }
 
-  const upcoming = db.appointments.filter(a => a.patientId === patient.id)
+  const upcoming = db.appointments.filter((a: any) => a.patientId === patient.id)
 
   return NextResponse.json({ success: true, appointments: upcoming })
 }

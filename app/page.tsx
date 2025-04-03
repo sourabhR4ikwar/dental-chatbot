@@ -121,7 +121,7 @@ export default function ChatPage() {
                       <span className="text-sm text-gray-500">Typing</span>
                     </div>
                   ) : (
-                    msg.content
+                    <div className="whitespace-pre-wrap">{msg.content}</div>
                   )}
                 </div>
               </div>

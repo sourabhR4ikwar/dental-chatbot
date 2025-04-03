@@ -143,6 +143,33 @@ Remember users name dob throughout the flow.
             required: ['name', 'dob', 'appointmentId']
           }
         }
+      },
+      {
+        type: 'function',
+        function: {
+          name: 'bookFamilyAppointments',
+          description: 'Books back-to-back appointments for multiple family members',
+          parameters: {
+            type: 'object',
+            properties: {
+              family: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    name: { type: 'string' },
+                    dob: { type: 'string' },
+                    appointmentType: { type: 'string', enum: ['Cleaning', 'Checkup'] }
+                  },
+                  required: ['name', 'dob', 'appointmentType']
+                }
+              },
+              preferredDate: { type: 'string' },
+              startingTime: { type: 'string' }
+            },
+            required: ['family', 'preferredDate', 'startingTime']
+          }
+        }
       }
     ],
     tool_choice: 'auto'
@@ -271,6 +298,16 @@ Remember users name dob throughout the flow.
 
     if (toolCall.function.name === 'cancelAppointment') {
       const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/appointment`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(args)
+      })
+      const data = await res.json()
+      return NextResponse.json({ reply: data.message })
+    }
+
+    if (toolCall.function.name === 'bookFamilyAppointments') {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/schedule/family`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(args)
